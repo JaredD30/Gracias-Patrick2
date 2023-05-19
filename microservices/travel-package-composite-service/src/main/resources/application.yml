@@ -1,0 +1,12 @@
+server.port: 7000
+server.error.include-message: always
+
+app:
+  travel-package-service:
+    host: localhost
+    port: 7001
+
+logging:
+  level:
+    root: INFO
+    se.magnus: DEBUG
