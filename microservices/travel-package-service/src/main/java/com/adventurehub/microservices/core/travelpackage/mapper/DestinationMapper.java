@@ -4,7 +4,7 @@ import com.adventurehub.microservices.core.travelpackage.entity.DestinationEntit
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import se.magnus.api.core.destination.Destination;
+import com.adventurehub.api.core.destination.Destination;
 
 @Mapper(componentModel = "spring")
 public interface DestinationMapper {

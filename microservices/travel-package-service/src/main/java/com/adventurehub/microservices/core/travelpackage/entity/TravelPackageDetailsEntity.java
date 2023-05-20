@@ -4,9 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
-@With
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -18,5 +15,21 @@ public class TravelPackageDetailsEntity {
     private Integer id;
 
     @Column(nullable = false, length = 255)
-    private String imageUrl;
+    private String image;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }

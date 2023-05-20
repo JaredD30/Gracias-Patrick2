@@ -5,7 +5,7 @@ import com.adventurehub.microservices.core.travelpackage.mapper.DestinationMappe
 import com.adventurehub.microservices.core.travelpackage.repository.DestinationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import se.magnus.api.core.destination.Destination;
+import com.adventurehub.api.core.destination.Destination;
 
 @Service
 public class DestinationSeed {

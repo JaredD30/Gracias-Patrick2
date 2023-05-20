@@ -7,11 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import se.magnus.api.core.season.Season;
-import se.magnus.api.core.season.SeasonService;
-import se.magnus.util.http.ServiceUtil;
+import com.adventurehub.api.core.season.Season;
+import com.adventurehub.api.core.season.SeasonService;
+import com.adventurehub.util.http.ServiceUtil;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @RestController

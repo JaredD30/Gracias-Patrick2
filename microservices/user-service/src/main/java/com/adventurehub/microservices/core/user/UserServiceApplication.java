@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan("se.magnus")
+@ComponentScan("com.adventurehub")
 public class UserServiceApplication {
 
 	public static void main(String[] args) {

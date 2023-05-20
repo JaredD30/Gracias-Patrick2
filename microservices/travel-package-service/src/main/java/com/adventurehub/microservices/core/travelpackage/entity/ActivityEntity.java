@@ -4,9 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
-@With
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -20,4 +17,28 @@ public class ActivityEntity {
     private String name;
 
     private Integer itineraryId;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getItineraryId() {
+        return itineraryId;
+    }
+
+    public void setItineraryId(Integer itineraryId) {
+        this.itineraryId = itineraryId;
+    }
 }

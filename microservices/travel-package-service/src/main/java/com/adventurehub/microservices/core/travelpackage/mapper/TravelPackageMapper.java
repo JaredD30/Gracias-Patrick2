@@ -4,12 +4,13 @@ import com.adventurehub.microservices.core.travelpackage.entity.TravelPackageEnt
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import se.magnus.api.core.travelpackage.TravelPackage;
+import com.adventurehub.api.core.travelpackage.TravelPackage;
 
 @Mapper(componentModel = "spring")
 public interface TravelPackageMapper {
     @Mappings({
-            @Mapping(target = "serviceAddress", ignore = true)
+            @Mapping(target = "serviceAddress", ignore = true),
+            @Mapping(target = "travelPackageId", ignore = true),
     })
     TravelPackage entityToApi(TravelPackageEntity entity);
 

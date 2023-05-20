@@ -4,7 +4,7 @@ import com.adventurehub.microservices.core.travelpackage.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import se.magnus.api.core.category.Category;
+import com.adventurehub.api.core.category.Category;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {

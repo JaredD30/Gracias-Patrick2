@@ -7,14 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import se.magnus.api.core.travelpackage.TravelPackage;
-import se.magnus.api.core.travelpackage.TravelPackageService;
-import se.magnus.util.http.ServiceUtil;
+import com.adventurehub.api.core.travelpackage.TravelPackage;
+import com.adventurehub.api.core.travelpackage.TravelPackageService;
+import com.adventurehub.util.http.ServiceUtil;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class TravelPackageServiceImpl implements TravelPackageService {
@@ -50,6 +49,25 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         LOG.debug("/travelPackages response size: {}", list.size());
 
         return list;
+    }
+
+    @Override
+    public TravelPackage getTravelPackageById(Integer travelPackageId) {
+
+        LOG.debug("/travelPackage return the found travelPackage for travelPackageId={}", travelPackageId);
+
+        Optional<TravelPackageEntity> entity = repository.findById(travelPackageId);
+
+        if(entity.isPresent()) {
+            TravelPackage response = mapper.entityToApi(entity.get());
+            response.setServiceAddress(serviceUtil.getServiceAddress());
+            response.setTravelPackageId(entity.get().getId());
+            LOG.debug("/travelPackage response {}", response);
+            return response;
+        }
+
+        return null;
+
     }
 
     @Override

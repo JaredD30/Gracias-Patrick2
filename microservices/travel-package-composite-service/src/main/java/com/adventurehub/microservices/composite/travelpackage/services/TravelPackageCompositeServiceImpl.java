@@ -1,17 +1,20 @@
 package com.adventurehub.microservices.composite.travelpackage.services;
 
+import com.adventurehub.api.composite.travelPackage.*;
+import com.adventurehub.util.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import se.magnus.api.composite.travelPackage.*;
-import se.magnus.api.core.category.Category;
-import se.magnus.api.core.destination.Destination;
-import se.magnus.api.core.itinerary.Itinerary;
-import se.magnus.api.core.season.Season;
-import se.magnus.api.core.travelpackage.TravelPackage;
-import se.magnus.api.core.travelpackagedetails.TravelPackageDetails;
-import se.magnus.util.http.ServiceUtil;
+import com.adventurehub.api.composite.travelPackage.resource.CreateTravelPackageResource;
+import com.adventurehub.api.core.activity.Activity;
+import com.adventurehub.api.core.category.Category;
+import com.adventurehub.api.core.destination.Destination;
+import com.adventurehub.api.core.itinerary.Itinerary;
+import com.adventurehub.api.core.season.Season;
+import com.adventurehub.api.core.travelpackage.TravelPackage;
+import com.adventurehub.api.core.travelpackagedetails.TravelPackageDetails;
+import com.adventurehub.util.http.ServiceUtil;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -33,13 +36,13 @@ public class TravelPackageCompositeServiceImpl implements TravelPackageComposite
     }
 
     @Override
-    public void createCompositeTravelPackage(TravelPackageAggregate body) {
+    public void createCompositeTravelPackage(CreateTravelPackageResource body) {
             try {
                 TravelPackage travelPackage = new TravelPackage(
                         null,
-                        body.getCategory().getCategoryId(),
-                        body.getDestination().getDestinationId(),
-                        body.getSeason().getSeasonId(),
+                        body.getCategoryId(),
+                        body.getDestinationId(),
+                        body.getSeasonId(),
                         body.getName(),
                         body.getDescription(),
                         body.getPrice(),
@@ -52,21 +55,33 @@ public class TravelPackageCompositeServiceImpl implements TravelPackageComposite
                 TravelPackage createdTravelPackage = integration.createTravelPackage(travelPackage);
                 LOG.debug("createCompositeTravelPackage: creates a new composite entity for travelPackageId: {}", createdTravelPackage.getTravelPackageId());
 
-//                if (body.getItineraries() != null) {
-//                    body.getItineraries().forEach(itinerary -> {
-//                        Itinerary itinerary1 = new Itinerary(
-//                                itinerary.getItineraryId(),
-//                                itinerary.getTravelPackageId(),
-//                                itinerary.getItineraryName(),
-//                                itinerary.getItineraryDescription(),
-//                                itinerary.getItineraryDate(),
-//                                itinerary.getItineraryTime(),
-//                                itinerary.getItineraryLocation(),
-//                                itinerary.getItineraryPrice()
-//                        );
-//                        integration.createItinerary(itinerary1);
-//                    });
-//                }
+                if(body.getImages() != null) {
+                    body.getImages().forEach(url -> {
+                        TravelPackageDetails details = new TravelPackageDetails();
+                        details.setImage(url);
+                        details.setTravelPackageId(createdTravelPackage.getTravelPackageId());
+                        integration.createTravelPackageDetails(details);
+                    });
+                }
+
+                if (body.getItineraries() != null) {
+                    body.getItineraries().forEach(i -> {
+                        Itinerary itinerary = new Itinerary();
+                        itinerary.setTravelPackageId(createdTravelPackage.getTravelPackageId());
+                        itinerary.setStartDate(i.getStartDate());
+                        itinerary.setEndDate(i.getEndDate());
+                        itinerary.setLatitude(i.getLatitude());
+                        itinerary.setLongitude(i.getLongitude());
+                        Itinerary itinerarySaved = integration.createItinerary(itinerary);
+
+                        for (String iActivity : i.getActivities()) {
+                            Activity activity = new Activity();
+                            activity.setItineraryId(itinerarySaved.getItineraryId());
+                            activity.setName(iActivity);
+                            integration.createActivity(activity);
+                        }
+                    });
+                }
 
                 LOG.debug("createCompositeTravelPackage: composite entites created for travelPackageId: {}",createdTravelPackage.getTravelPackageId());
 
@@ -84,11 +99,22 @@ public class TravelPackageCompositeServiceImpl implements TravelPackageComposite
         LOG.debug("/travelPackage-composite getTravelPackages found: {}", travelPackages.size());
 
         return travelPackages.stream()
-                .map(tp -> createTravelPackageAggregate(tp, serviceUtil.getServiceAddress()))
+                .map(tp -> createTravelPackageAggregate(tp, serviceUtil.getServiceAddress(),true))
                 .collect(Collectors.toList());
     }
 
-    private TravelPackageAggregate createTravelPackageAggregate(TravelPackage travelPackage, String serviceAddress) {
+    @Override
+    public TravelPackageAggregate getCompositeTravelPackage(Integer travelPackageId) {
+        TravelPackage travelPackage = integration.getTravelPackageById(travelPackageId);
+
+        if (travelPackage == null) throw new NotFoundException("No travelPackage found for travelPackageId: " + travelPackageId);
+
+        LOG.debug("/travelPackage-composite getTravelPackage found: {}", travelPackageId);
+
+        return createTravelPackageAggregate(travelPackage, serviceUtil.getServiceAddress(), false);
+    }
+
+    private TravelPackageAggregate createTravelPackageAggregate(TravelPackage travelPackage, String serviceAddress, Boolean individual) {
 
         // 1. Setup travel package info
         Integer travelPackageId = travelPackage.getTravelPackageId();
@@ -110,7 +136,7 @@ public class TravelPackageCompositeServiceImpl implements TravelPackageComposite
         // 2. Copy summary info, if available
         List<ItinerarySummary> itinerariesSummary = (itineraries == null) ? null :
                 itineraries.stream()
-                        .map(i -> new ItinerarySummary(i.getItineraryId(), i.getStartDate(), i.getEndDate(),i.getOrigin(),i.getDestination(),i.getLatitude(),i.getLongitude()))
+                        .map(i -> new ItinerarySummary(i.getItineraryId(), i.getStartDate(), i.getEndDate(),i.getLatitude(),i.getLongitude()))
                         .collect(Collectors.toList());
         List<TravelPackageDetailsSummary> travelPackageDetailsSummary = (travelPackageDetails == null) ? null :
                 travelPackageDetails.stream()
@@ -143,8 +169,8 @@ public class TravelPackageCompositeServiceImpl implements TravelPackageComposite
                 groupSize,
                 status,
                 travelPackageAddress,
-                itinerariesSummary,
-                travelPackageDetailsSummary,
+                individual ? null : itinerariesSummary,
+                individual ? null : travelPackageDetailsSummary,
                 serviceAddresses
         );
 

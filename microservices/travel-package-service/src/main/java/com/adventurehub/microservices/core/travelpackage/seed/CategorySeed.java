@@ -5,7 +5,7 @@ import com.adventurehub.microservices.core.travelpackage.mapper.CategoryMapper;
 import com.adventurehub.microservices.core.travelpackage.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import se.magnus.api.core.category.Category;
+import com.adventurehub.api.core.category.Category;
 
 import java.util.Arrays;
 

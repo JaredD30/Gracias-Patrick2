@@ -12,8 +12,8 @@ spring:
     username: root
     password: mystrongpassword2023
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    hikari:
-#      initializationFailTimeout: 60000
+    hikari:
+      initializationFailTimeout: 60000
   jpa:
     hibernate:
       ddl-auto: update

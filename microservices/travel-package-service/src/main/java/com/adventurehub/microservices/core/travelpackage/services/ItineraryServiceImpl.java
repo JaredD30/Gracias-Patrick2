@@ -1,17 +1,17 @@
 package com.adventurehub.microservices.core.travelpackage.services;
 
+import com.adventurehub.microservices.core.travelpackage.entity.ItineraryEntity;
+import com.adventurehub.microservices.core.travelpackage.mapper.ItineraryMapper;
+import com.adventurehub.microservices.core.travelpackage.repository.ItineraryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import se.magnus.api.core.itinerary.Itinerary;
-import se.magnus.api.core.itinerary.ItineraryService;
-import se.magnus.api.core.travelpackage.TravelPackage;
-import se.magnus.api.core.travelpackage.TravelPackageService;
-import se.magnus.util.http.ServiceUtil;
+import com.adventurehub.api.core.itinerary.Itinerary;
+import com.adventurehub.api.core.itinerary.ItineraryService;
+import com.adventurehub.util.http.ServiceUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -21,9 +21,15 @@ public class ItineraryServiceImpl implements ItineraryService {
 
     private final ServiceUtil serviceUtil;
 
+    private final ItineraryRepository repository;
+
+    private final ItineraryMapper mapper;
+
     @Autowired
-    public ItineraryServiceImpl(ServiceUtil serviceUtil) {
+    public ItineraryServiceImpl(ServiceUtil serviceUtil, ItineraryRepository repository, ItineraryMapper mapper) {
         this.serviceUtil = serviceUtil;
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -33,11 +39,29 @@ public class ItineraryServiceImpl implements ItineraryService {
 
         if (travelPackageId < 1) throw new IllegalArgumentException("Invalid travelPackageId: " + travelPackageId);
 
-//        list.add(new Itinerary(1, travelPackageId, new Date(),new Date(), "Origin 1", "Destination 1", 1.0, 1.0, serviceUtil.getServiceAddress()));
-//        list.add(new Itinerary(2, travelPackageId, new Date(),new Date(), "Origin 1", "Destination 1", 1.0, 1.0, serviceUtil.getServiceAddress()));
+        Iterable<ItineraryEntity> entityList = repository.findByTravelPackageId(travelPackageId);
+        entityList.forEach(e -> {
+            Itinerary response = mapper.entityToApi(e);
+            response.setItineraryId(e.getId());
+            response.setServiceAddress(serviceUtil.getServiceAddress());
+            list.add(response);
+        });
 
         LOG.debug("/itinerary response size: {}", list.size());
-
         return list;
+    }
+
+    @Override
+    public Itinerary createItinerary(Itinerary body){
+
+        ItineraryEntity entity = mapper.apiToEntity(body);
+        ItineraryEntity newEntity = repository.save(entity);
+
+        LOG.debug("createItinerary: entity created for travelPackageDetailsId", newEntity.getId() );
+
+        Itinerary activity = mapper.entityToApi(newEntity);
+        activity.setItineraryId(newEntity.getId());
+
+        return activity;
     }
 }

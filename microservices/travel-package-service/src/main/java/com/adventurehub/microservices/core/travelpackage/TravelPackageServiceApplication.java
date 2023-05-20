@@ -8,7 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan("se.magnus")
+@ComponentScan("com.adventurehub")
 public class TravelPackageServiceApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TravelPackageServiceApplication.class);

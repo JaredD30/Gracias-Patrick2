@@ -4,7 +4,7 @@ import com.adventurehub.microservices.core.travelpackage.entity.SeasonEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import se.magnus.api.core.season.Season;
+import com.adventurehub.api.core.season.Season;
 
 @Mapper(componentModel = "spring")
 public interface SeasonMapper {
